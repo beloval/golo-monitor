@@ -2,15 +2,19 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>ca.golomonitor</groupId>
+    <groupId>com.golomonitor</groupId>
     <artifactId>golomonitor-api</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>GOLO monitor app to monitor of server status</name>
+
     <properties>
         <golomonitor.version>1.0-SNAPSHOT</golomonitor.version>
         <commons-io.version>2.4</commons-io.version>
+        <spring.core.version>4.2.4.RELEASE</spring.core.version>
+        <javax.servlet.api.version>3.0.1</javax.servlet.api.version>
     </properties>
+
     <modules>
         <module>api</module>
         <module>service</module>
@@ -38,6 +42,13 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                </configuration>
             </plugin>
 
             <!-- Build Verison in the application header -->
@@ -100,13 +111,13 @@
     <dependencyManagement>
     <dependencies>
         <dependency>
-            <groupId>ca.golomonitor</groupId>
+            <groupId>com.golomonitor</groupId>
             <artifactId>golomonitorService</artifactId>
             <version>${golomonitor.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>ca.golomonitor</groupId>
+            <groupId>com.golomonitor</groupId>
             <artifactId>golomonitorApi</artifactId>
             <version>${golomonitor.version}</version>
         </dependency>
@@ -115,6 +126,25 @@
             <artifactId>commons-io</artifactId>
             <version>${commons-io.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <version>${spring.core.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>${javax.servlet.api.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>${spring.core.version}</version>
+        </dependency>
+
     </dependencies>
     </dependencyManagement>
 </project>
