@@ -1,7 +1,7 @@
 package com.golomonitor.services.core;
 
 
-import com.golomonitor.dto.LaunchingApiResponseDTO;
+import com.golomonitor.dto.LaunchingApiResponseEntity;
 import com.golomonitor.exception.ExternalServiceException;
 import com.golomonitor.exception.GoloMonitorStopedException;
 
@@ -10,5 +10,5 @@ import com.golomonitor.exception.GoloMonitorStopedException;
  */
 public interface LaunchingApiService {
 
-    LaunchingApiResponseDTO launch(String assetNumber) throws ExternalServiceException, GoloMonitorStopedException;
+    LaunchingApiResponseEntity launch(Boolean launch, String hostname, Integer interval) throws ExternalServiceException, GoloMonitorStopedException;
 }

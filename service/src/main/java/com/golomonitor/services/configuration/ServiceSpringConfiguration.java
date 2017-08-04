@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ComponentScan(basePackages = {"com.golomonitor.services"})
-public class ExternalServiceSpringConfiguration {
+public class ServiceSpringConfiguration {
 
 
 }
