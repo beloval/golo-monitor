@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Created by abelov on 02/08/17.
@@ -38,36 +40,43 @@ public class LaunchingApiServiceImpl implements LaunchingApiService {
         goloMonitorStatistic.getServerStatus().set(launch);
         goloMonitorStatistic.setServerStatusList(new LinkedHashMap<>());
 
-        try {
-            startMonitor(hostname, interval);
-
-        } catch (InterruptedException e) {
-            logger.error(INTERRUPTED_EXCEPTION, e);
-            throw new ExternalServiceException(INTERRUPTED_EXCEPTION);
-        }
+        startMonitor(hostname, interval);
 
         return null;
     }
 
-    private void startMonitor(String hostname, Integer interval) throws InterruptedException {
+    private void startMonitor(String hostname, Integer interval) {
 
+        ExecutorService service = Executors.newFixedThreadPool((interval > 1000 ? 1 : 8));
+        service.submit(() -> {
+            try {
+                startServer(hostname, interval);
+            } catch (InterruptedException e) {
+                logger.error(INTERRUPTED_EXCEPTION, e);
+            }
+        });
+
+
+    }
+
+    private void startServer(String hostname, Integer interval) throws InterruptedException {
         while (goloMonitorStatistic.getServerStatus().get()) {
-            Thread.sleep(interval);
-            goloMonitorStatistic.getNumberRequestToServer().addAndGet(1L);
 
+            goloMonitorStatistic.getNumberRequestToServer().addAndGet(1L);
+            logger.info("send request to paysave");
             try {
                 ServerStatusEnum status = paysafeService.getPaysafeServerStatus(hostname);
                 goloMonitorStatistic.getServerStatusList().put(new Date(), status);
                 if (ServerStatusEnum.READY.equals(status)) {
                     goloMonitorStatistic.getNumberStatusActive().addAndGet(1L);
                 }
+                logger.info("got response from paysave: status:" + status);
+                Thread.sleep(interval);
             } catch (ExternalServiceException e) {
                 goloMonitorStatistic.getServerStatusList().put(new Date(), ServerStatusEnum.ERROR);
                 goloMonitorStatistic.getNumberStatusOfErrors().addAndGet(1L);
             }
 
         }
-
-
     }
 }
