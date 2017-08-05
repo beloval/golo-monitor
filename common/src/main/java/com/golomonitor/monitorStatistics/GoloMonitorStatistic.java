@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -31,6 +32,15 @@ public class GoloMonitorStatistic {
 
     private Map<Date, ServerStatusEnum> serverStatusList = new LinkedHashMap<>();
 
+    private ExecutorService service;
+
+    public ExecutorService getService() {
+        return service;
+    }
+
+    public void setService(ExecutorService service) {
+        this.service = service;
+    }
 
     public Map<Date, ServerStatusEnum> getServerStatusList() {
         return serverStatusList;

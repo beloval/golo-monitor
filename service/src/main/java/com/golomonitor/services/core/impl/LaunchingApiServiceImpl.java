@@ -27,6 +27,7 @@ public class LaunchingApiServiceImpl implements LaunchingApiService {
 
     private static final Logger logger = LoggerFactory.getLogger(LaunchingApiServiceImpl.class);
     private static final String INTERRUPTED_EXCEPTION = "Interrupted Exception happened";
+    private static final long LIMIT_OF_REQEST = 10000;//limiting statistic it should be in external file.properties
 
     @Autowired
     GoloMonitorStatistic goloMonitorStatistic;
@@ -39,10 +40,8 @@ public class LaunchingApiServiceImpl implements LaunchingApiService {
     public LaunchingApiResponseEntity launch(Boolean launch, String hostname, Integer interval) throws ExternalServiceException, GoloMonitorStopedException {
 
         goloMonitorStatistic.getGoloMonitorStatus().set(launch);
-        if (launch) {
-            resetStatistic();
-            startMonitor(hostname, interval);
-        }
+        startMonitor(hostname, interval);
+
         return createLaunchingApiResponsEntity();
     }
 
@@ -76,14 +75,22 @@ public class LaunchingApiServiceImpl implements LaunchingApiService {
 
     private void startMonitor(String hostname, Integer interval) {
 
-        ExecutorService service = Executors.newFixedThreadPool((interval > 1000 ? 1 : 8));
-        service.submit(() -> {
-            try {
-                startServer(hostname, interval);
-            } catch (InterruptedException e) {
-                logger.error(INTERRUPTED_EXCEPTION, e);
-            }
-        });
+
+        if (goloMonitorStatistic.getGoloMonitorStatus().get()) {
+            ExecutorService service =  Executors.newFixedThreadPool((interval > 1000 ? 1 : 8));   //setup from file.properties
+            goloMonitorStatistic.setService(service);
+            resetStatistic();
+            service.submit(() -> {
+                try {
+                    startServer(hostname, interval);
+                } catch (InterruptedException e) {
+                    logger.error(INTERRUPTED_EXCEPTION, e);
+                }
+            });
+        }  else {
+            logger.info("close current thread: "+ Thread.currentThread().getName());
+            goloMonitorStatistic.getService().shutdownNow();
+        }
 
 
     }
@@ -107,7 +114,10 @@ public class LaunchingApiServiceImpl implements LaunchingApiService {
                 goloMonitorStatistic.getNumberStatusOfErrors().addAndGet(1L);
             }
             Thread.sleep(interval);
-
+            if (goloMonitorStatistic.getNumberRequestToServer().get() > LIMIT_OF_REQEST) {
+                logger.info("reached max of allowed number of requests");
+                resetStatistic();
+            }
         }
     }
 }
