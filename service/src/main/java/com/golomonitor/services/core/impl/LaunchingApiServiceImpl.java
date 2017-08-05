@@ -101,11 +101,12 @@ public class LaunchingApiServiceImpl implements LaunchingApiService {
                     goloMonitorStatistic.getNumberStatusActive().addAndGet(1L);
                 }
                 logger.info("got response from paysave: status:" + status);
-                Thread.sleep(interval);
+
             } catch (ExternalServiceException e) {
                 goloMonitorStatistic.getServerStatusList().put(new Date(), ServerStatusEnum.ERROR);
                 goloMonitorStatistic.getNumberStatusOfErrors().addAndGet(1L);
             }
+            Thread.sleep(interval);
 
         }
     }

@@ -29,7 +29,7 @@ public class PaysafeServiceImpl extends AbstractProviderService implements Exter
             logger.debug("Received status from paysafe : " + response.getStatus());
             return mappingResponse(response);
 
-        } catch (WebApplicationException ex) {
+        } catch (Exception ex) {
             logger.error(PAYSAFE_SERVER_EXEPTION, ex);
             throw new ExternalServiceException(PAYSAFE_SERVER_EXEPTION);
         }
