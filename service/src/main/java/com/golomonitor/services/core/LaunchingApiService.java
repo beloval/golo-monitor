@@ -11,4 +11,5 @@ import com.golomonitor.exception.GoloMonitorStopedException;
 public interface LaunchingApiService {
 
     LaunchingApiResponseEntity launch(Boolean launch, String hostname, Integer interval) throws ExternalServiceException, GoloMonitorStopedException;
+    LaunchingApiResponseEntity getStatistic();
 }

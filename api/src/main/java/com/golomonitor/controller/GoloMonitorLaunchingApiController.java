@@ -3,6 +3,7 @@ package com.golomonitor.controller;
 
 import com.golomonitor.dto.LaunchingApiResponseEntity;
 import com.golomonitor.exception.ExternalServiceException;
+import com.golomonitor.exception.GoloMonitorStartedException;
 import com.golomonitor.exception.GoloMonitorStopedException;
 import com.golomonitor.exception.LaunchingApiException;
 import com.golomonitor.monitorStatistics.GoloMonitorStatistic;
@@ -24,6 +25,7 @@ public class GoloMonitorLaunchingApiController {
 
     private static final Logger logger = LoggerFactory.getLogger(GoloMonitorLaunchingApiController.class);
     private static final String SERVER_ALREADY_STOPPED = "GOLO monitor have been already stopped";
+    private static final String SERVER_ALREADY_STARTED = "GOLO monitor have been already started";
     @Autowired
     GoloMonitorStatistic goloMonitorStatistic;
     @Autowired
@@ -35,11 +37,14 @@ public class GoloMonitorLaunchingApiController {
             @RequestParam(value = "launch") Boolean launch,
             @RequestParam(value = "hostname") String hostname,
             @RequestParam(value = "interval") Integer interval
-    ) throws LaunchingApiException, GoloMonitorStopedException {
+    ) throws LaunchingApiException, GoloMonitorStopedException, GoloMonitorStartedException {
         try {
             logger.info((launch ? "start monitor requests to " + hostname + "with intervals: " + interval : " stopping monitor"));
-            if (!goloMonitorStatistic.getServerStatus().get() && !launch) {
+            if (!goloMonitorStatistic.getGoloMonitorStatus().get() && !launch) {
                 throw new GoloMonitorStopedException(SERVER_ALREADY_STOPPED);
+            }
+            if (goloMonitorStatistic.getGoloMonitorStatus().get() && launch) {
+                throw new GoloMonitorStartedException(SERVER_ALREADY_STARTED);
             }
             return launchingApiService.launch(launch, hostname, interval);
 

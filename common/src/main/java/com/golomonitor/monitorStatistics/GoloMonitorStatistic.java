@@ -4,6 +4,7 @@ import com.golomonitor.enums.ServerStatusEnum;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -16,7 +17,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class GoloMonitorStatistic {
 
 
-    private AtomicBoolean serverStatus = new AtomicBoolean();
+    private AtomicBoolean goloMonitorStatus = new AtomicBoolean();
 
     private AtomicLong numberRequestToServer = new AtomicLong();
 
@@ -26,7 +27,9 @@ public class GoloMonitorStatistic {
 
     private AtomicLong numberStatusOfErrors = new AtomicLong();
 
-    private Map<Date, ServerStatusEnum> serverStatusList;
+    private ServerStatusEnum serverLastStatus;
+
+    private Map<Date, ServerStatusEnum> serverStatusList = new LinkedHashMap<>();
 
 
     public Map<Date, ServerStatusEnum> getServerStatusList() {
@@ -37,8 +40,8 @@ public class GoloMonitorStatistic {
         this.serverStatusList = serverStatusList;
     }
 
-    public AtomicBoolean getServerStatus() {
-        return serverStatus;
+    public AtomicBoolean getGoloMonitorStatus() {
+        return goloMonitorStatus;
     }
 
     public AtomicLong getNumberRequestToServer() {
@@ -57,5 +60,12 @@ public class GoloMonitorStatistic {
         return numberStatusActive;
     }
 
+    public ServerStatusEnum getServerLastStatus() {
+        return serverLastStatus;
+    }
 
+    public void setServerLastStatus(ServerStatusEnum serverLastStatus) {
+        this.serverLastStatus = serverLastStatus;
+    }
 }
+
