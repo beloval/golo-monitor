@@ -28,16 +28,17 @@ public class LaunchingApiServiceImpl implements LaunchingApiService {
     private static final Logger logger = LoggerFactory.getLogger(LaunchingApiServiceImpl.class);
     private static final String INTERRUPTED_EXCEPTION = "Interrupted Exception happened";
     private static final long LIMIT_OF_REQEST = 10000;//limiting statistic it should be in external file.properties
+    public static final String RETURN_MONITOR_STATISTIC = "Return monitors full statistic";
 
     @Autowired
-    GoloMonitorStatistic goloMonitorStatistic;
+    private GoloMonitorStatistic goloMonitorStatistic;
 
     @Autowired
-    ExternalServiceProvider paysafeService;
+    private ExternalServiceProvider paysafeService;
 
 
     @Override
-    public LaunchingApiResponseEntity launch(Boolean launch, String hostname, Integer interval) throws ExternalServiceException, GoloMonitorStopedException {
+    public LaunchingApiResponseEntity launch(Boolean launch, String hostname, Integer interval) {
 
         goloMonitorStatistic.getGoloMonitorStatus().set(launch);
         startMonitor(hostname, interval);
@@ -59,6 +60,7 @@ public class LaunchingApiServiceImpl implements LaunchingApiService {
         response.setGoloMonitorStatus(goloMonitorStatistic.getGoloMonitorStatus().get() ? GoloMonitorStatusEnum.STARTED : GoloMonitorStatusEnum.STOPPED);
         response.setServerLastStatus(goloMonitorStatistic.getServerLastStatus());
         response.getServerStatusList().putAll(goloMonitorStatistic.getServerStatusList());
+        logger.info(RETURN_MONITOR_STATISTIC);
         return response;
     }
 
@@ -66,11 +68,10 @@ public class LaunchingApiServiceImpl implements LaunchingApiService {
         goloMonitorStatistic.setServerStatusList(new LinkedHashMap<>());
         goloMonitorStatistic.setServerLastStatus(null);
         goloMonitorStatistic.getNumberStatusActive().set(0);
-        goloMonitorStatistic.getNumberStatusOfErrors();
+        goloMonitorStatistic.getNumberStatusOfErrors().set(0);
         goloMonitorStatistic.getNumberRequestToServer().set(0);
         goloMonitorStatistic.getNumberStatusInActive().set(0);
-        goloMonitorStatistic.getNumberStatusOfErrors().set(0);
-    }
+      }
 
 
     private void startMonitor(String hostname, Integer interval) {
