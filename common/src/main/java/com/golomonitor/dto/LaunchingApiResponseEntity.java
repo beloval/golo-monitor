@@ -82,4 +82,5 @@ public class LaunchingApiResponseEntity {
         this.goloMonitorStatus = goloMonitorStatus;
     }
 
+
 }

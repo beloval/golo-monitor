@@ -29,8 +29,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.golomonitor.controller.GoloMonitorLaunchingApiController.SERVER_ALREADY_STARTED;
 import static com.golomonitor.controller.GoloMonitorLaunchingApiController.SERVER_ALREADY_STOPPED;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
 
@@ -112,10 +117,10 @@ public class GoloMonitorLauchingApiControllerTest {
 
         verify(launchingApiService, times(1)).launch(LAUNCH_PARAMETER, HOSTNAME_PARAMETER, INTERVAL_PARAMETER);
         verify(goloMonitorStatistic, times(2)).getGoloMonitorStatus();
-        verify(mockAppender, times(6)).doAppend(captorLoggingEvent.capture());
+        verify(mockAppender, times(8)).doAppend(captorLoggingEvent.capture());
         List<LoggingEvent> loggingEventList = captorLoggingEvent.getAllValues();
-        Assert.assertEquals("start monitor requests to " + HOSTNAME_PARAMETER + " with intervals: " + INTERVAL_IN_MILLISECOND, loggingEventList.get(5).getMessage());
-        Assert.assertEquals(Level.INFO, loggingEventList.get(5).getLevel());
+        Assert.assertEquals("start monitor requests to " + HOSTNAME_PARAMETER + " with intervals: " + INTERVAL_IN_MILLISECOND, loggingEventList.get(7).getMessage());
+        Assert.assertEquals(Level.INFO, loggingEventList.get(7).getLevel());
 
         noMoreInteractions();
 
@@ -140,7 +145,7 @@ public class GoloMonitorLauchingApiControllerTest {
         MockMvc mockMvc =
                 standaloneSetup(controller).build();
         ResultActions result = mockMvc.perform(requestBuilder);
- /*       result
+    /*    result
                 .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(status().isOk())
@@ -160,10 +165,10 @@ public class GoloMonitorLauchingApiControllerTest {
 
         verify(launchingApiService, times(1)).launch(!LAUNCH_PARAMETER, HOSTNAME_PARAMETER, INTERVAL_PARAMETER);
         verify(goloMonitorStatistic, times(2)).getGoloMonitorStatus();
-        verify(mockAppender, times(6)).doAppend(captorLoggingEvent.capture());
+        verify(mockAppender, times(8)).doAppend(captorLoggingEvent.capture());
         List<LoggingEvent> loggingEventList = captorLoggingEvent.getAllValues();
-        Assert.assertEquals(" stopping monitor", loggingEventList.get(5).getMessage());
-        Assert.assertEquals(Level.INFO, loggingEventList.get(5).getLevel());
+        Assert.assertEquals(" stopping monitor", loggingEventList.get(7).getMessage());
+        Assert.assertEquals(Level.INFO, loggingEventList.get(7).getLevel());
 
         noMoreInteractions();
 
@@ -204,12 +209,12 @@ public class GoloMonitorLauchingApiControllerTest {
 
         verify(launchingApiService, times(0)).launch(!LAUNCH_PARAMETER, HOSTNAME_PARAMETER, INTERVAL_PARAMETER);
         verify(goloMonitorStatistic, times(1)).getGoloMonitorStatus();
-        verify(mockAppender, times(7)).doAppend(captorLoggingEvent.capture());
+        verify(mockAppender, times(9)).doAppend(captorLoggingEvent.capture());
         List<LoggingEvent> loggingEventList = captorLoggingEvent.getAllValues();
-        Assert.assertEquals(" stopping monitor", loggingEventList.get(5).getMessage());
-        Assert.assertEquals(Level.INFO, loggingEventList.get(5).getLevel());
-        Assert.assertEquals("Error to stop monitor : [" + SERVER_ALREADY_STOPPED + "]", loggingEventList.get(6).getMessage());
-        Assert.assertEquals(Level.ERROR, loggingEventList.get(6).getLevel());
+        Assert.assertEquals(" stopping monitor", loggingEventList.get(7).getMessage());
+        Assert.assertEquals(Level.INFO, loggingEventList.get(7).getLevel());
+        Assert.assertEquals("Error to stop monitor : [" + SERVER_ALREADY_STOPPED + "]", loggingEventList.get(8).getMessage());
+        Assert.assertEquals(Level.ERROR, loggingEventList.get(8).getLevel());
 
         noMoreInteractions();
 
@@ -236,7 +241,7 @@ public class GoloMonitorLauchingApiControllerTest {
             result = mockMvc.perform(requestBuilder);
             Assert.fail("Expected GoloMonitorStartedException");
         } catch (Exception e) {
-            Assert.assertEquals(e.getMessage(), "Request processing failed; nested exception is com.golomonitor.exception.LaunchingApiException: com.golomonitor.exception.GoloMonitorStartedException: " + SERVER_ALREADY_STARTED);
+            Assert.assertEquals(e.getMessage(), "Request processing failed; nested exception is com.golomonitor.exception.GoloMonitorStartedException: com.golomonitor.exception.GoloMonitorStartedException: " + SERVER_ALREADY_STARTED);
 
         }
  /*       result
@@ -251,12 +256,12 @@ public class GoloMonitorLauchingApiControllerTest {
 
         verify(launchingApiService, times(0)).launch(!LAUNCH_PARAMETER, HOSTNAME_PARAMETER, INTERVAL_PARAMETER);
         verify(goloMonitorStatistic, times(2)).getGoloMonitorStatus();
-        verify(mockAppender, times(7)).doAppend(captorLoggingEvent.capture());
+        verify(mockAppender, times(9)).doAppend(captorLoggingEvent.capture());
         List<LoggingEvent> loggingEventList = captorLoggingEvent.getAllValues();
-        Assert.assertEquals("start monitor requests to " + HOSTNAME_PARAMETER + " with intervals: " + INTERVAL_IN_MILLISECOND, loggingEventList.get(5).getMessage());
-        Assert.assertEquals(Level.INFO, loggingEventList.get(5).getLevel());
-        Assert.assertEquals("Error to start monitor : [" + SERVER_ALREADY_STARTED + "]", loggingEventList.get(6).getMessage());
-        Assert.assertEquals(Level.ERROR, loggingEventList.get(6).getLevel());
+        Assert.assertEquals("start monitor requests to " + HOSTNAME_PARAMETER + " with intervals: " + INTERVAL_IN_MILLISECOND, loggingEventList.get(7).getMessage());
+        Assert.assertEquals(Level.INFO, loggingEventList.get(7).getLevel());
+        Assert.assertEquals("Error to start monitor : [" + SERVER_ALREADY_STARTED + "]", loggingEventList.get(8).getMessage());
+        Assert.assertEquals(Level.ERROR, loggingEventList.get(8).getLevel());
 
         noMoreInteractions();
 
@@ -298,12 +303,12 @@ public class GoloMonitorLauchingApiControllerTest {
 
         verify(launchingApiService, times(1)).launch(LAUNCH_PARAMETER, HOSTNAME_PARAMETER, INTERVAL_PARAMETER);
         verify(goloMonitorStatistic, times(2)).getGoloMonitorStatus();
-        verify(mockAppender, times(7)).doAppend(captorLoggingEvent.capture());
+        verify(mockAppender, times(9)).doAppend(captorLoggingEvent.capture());
         List<LoggingEvent> loggingEventList = captorLoggingEvent.getAllValues();
-        Assert.assertEquals("start monitor requests to " + HOSTNAME_PARAMETER + " with intervals: " + INTERVAL_IN_MILLISECOND, loggingEventList.get(5).getMessage());
-        Assert.assertEquals(Level.INFO, loggingEventList.get(5).getLevel());
-        Assert.assertEquals("Exception happened when  start monitor : [Null pointer]", loggingEventList.get(6).getMessage());
-        Assert.assertEquals(Level.ERROR, loggingEventList.get(6).getLevel());
+        Assert.assertEquals("start monitor requests to " + HOSTNAME_PARAMETER + " with intervals: " + INTERVAL_IN_MILLISECOND, loggingEventList.get(7).getMessage());
+        Assert.assertEquals(Level.INFO, loggingEventList.get(7).getLevel());
+        Assert.assertEquals("Exception happened when  start monitor : [Null pointer]", loggingEventList.get(8).getMessage());
+        Assert.assertEquals(Level.ERROR, loggingEventList.get(8).getLevel());
 
         noMoreInteractions();
 

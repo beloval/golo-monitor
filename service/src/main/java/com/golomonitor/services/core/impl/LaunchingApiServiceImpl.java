@@ -51,6 +51,11 @@ public class LaunchingApiServiceImpl implements LaunchingApiService {
         return createLaunchingApiResponsEntity();
     }
 
+    @Override
+    public LaunchingApiResponseEntity stop(Boolean launch) {
+        return launch(false, "", 0);
+    }
+
     private LaunchingApiResponseEntity createLaunchingApiResponsEntity() {
         LaunchingApiResponseEntity response = new LaunchingApiResponseEntity();
         response.setNumberRequestToServer(goloMonitorStatistic.getNumberRequestToServer().get());

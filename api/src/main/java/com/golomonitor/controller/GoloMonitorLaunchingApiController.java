@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
  */
 
 @RestController
-@RequestMapping("/golomonitor/launch")
+@RequestMapping("/golomonitor")
 public class GoloMonitorLaunchingApiController {
 
     public static final String SERVER_ALREADY_STOPPED = "GOLO monitor have been already stopped";
@@ -30,7 +30,7 @@ public class GoloMonitorLaunchingApiController {
     @Autowired
     private LaunchingApiService launchingApiService;
 
-    @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(path = "/launch", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public LaunchingApiResponseEntity postLaunching(
             @RequestParam(value = "launch") Boolean launch,
@@ -49,12 +49,47 @@ public class GoloMonitorLaunchingApiController {
 
         } catch (GoloMonitorStartedException e) {
             logger.error("Error to" + (launch ? " start " : " stop ") + "monitor : [{}]", e.getMessage(), e);
-            throw new LaunchingApiException(e);
+            throw new GoloMonitorStartedException(e);
         } catch (GoloMonitorStopedException e) {
             logger.error("Error to" + (launch ? " start " : " stop ") + "monitor : [{}]", e.getMessage(), e);
             throw new GoloMonitorStopedException(e);
         } catch (Exception e) {
             logger.error("Exception happened when " + (launch ? " start " : " stop ") + "monitor : [{}]", e.getMessage(), e);
+            throw new LaunchingApiException(e.getMessage());
+        }
+
+
+    }
+
+    @RequestMapping(path = "/stop", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public LaunchingApiResponseEntity postStopping() throws LaunchingApiException, GoloMonitorStopedException {
+        try {
+            logger.info("stopping monitor");
+            if (!goloMonitorStatistic.getGoloMonitorStatus().get()) {
+                throw new GoloMonitorStopedException(SERVER_ALREADY_STOPPED);
+            }
+            return launchingApiService.stop(false);
+
+        } catch (GoloMonitorStopedException e) {
+            logger.error("Error to stop monitor : [{}]", e.getMessage(), e);
+            throw new GoloMonitorStopedException(e);
+        } catch (Exception e) {
+            logger.error("Exception happened when  stop monitor : [{}]", e.getMessage(), e);
+            throw new LaunchingApiException(e.getMessage());
+        }
+
+
+    }
+
+    @RequestMapping(path = "/statistics", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public LaunchingApiResponseEntity getStatistics() throws LaunchingApiException, GoloMonitorStopedException {
+        try {
+            logger.info("getting monitor statistics");
+            return launchingApiService.getStatistic();
+        } catch (Exception e) {
+            logger.error("Exception happened when  stop monitor : [{}]", e.getMessage(), e);
             throw new LaunchingApiException(e.getMessage());
         }
 

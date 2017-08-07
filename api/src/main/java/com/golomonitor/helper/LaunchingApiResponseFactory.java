@@ -7,6 +7,7 @@ import com.golomonitor.exception.LaunchingApiException;
 import com.golomonitor.services.core.LaunchingApiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 
 /**
@@ -35,5 +36,12 @@ public class LaunchingApiResponseFactory {
 
     public Object createExceptionResponse(LaunchingApiException ex) {
         return new LaunchingApiResponseError(ex.getMessage());
+    }
+
+    public LaunchingApiResponseError createArgumentNotValidBadRequestResponse(MethodArgumentNotValidException ex) {
+        StringBuffer message = new StringBuffer();
+        message.append("Parameter has invalide value!! Error: ");
+        message.append(ex.getMessage());
+        return new LaunchingApiResponseError(message.toString());
     }
 }

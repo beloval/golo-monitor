@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -31,7 +32,11 @@ public class GoloMonitorExeptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, launchingApiResponseFactory.createBadRequestResponse(ex),
                 new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
-
+    @Override
+    public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        return handleExceptionInternal(ex, launchingApiResponseFactory.createArgumentNotValidBadRequestResponse(ex),
+                new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    }
 
     @ExceptionHandler(value = LaunchingApiException.class)
     public ResponseEntity<Object> handleLaunchingApiException(LaunchingApiException ex, WebRequest request) {
