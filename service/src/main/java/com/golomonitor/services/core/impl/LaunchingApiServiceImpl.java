@@ -4,7 +4,6 @@ import com.golomonitor.dto.LaunchingApiResponseEntity;
 import com.golomonitor.enums.GoloMonitorStatusEnum;
 import com.golomonitor.enums.ServerStatusEnum;
 import com.golomonitor.exception.ExternalServiceException;
-import com.golomonitor.exception.GoloMonitorStopedException;
 import com.golomonitor.externalservices.ExternalServiceProvider;
 import com.golomonitor.monitorStatistics.GoloMonitorStatistic;
 import com.golomonitor.services.core.LaunchingApiService;
@@ -25,11 +24,10 @@ import java.util.concurrent.Executors;
 @Service
 public class LaunchingApiServiceImpl implements LaunchingApiService {
 
+    public static final String RETURN_MONITOR_STATISTIC = "Return monitors full statistic";
     private static final Logger logger = LoggerFactory.getLogger(LaunchingApiServiceImpl.class);
     private static final String INTERRUPTED_EXCEPTION = "Interrupted Exception happened";
     private static final long LIMIT_OF_REQEST = 10000;//limiting statistic it should be in external file.properties
-    public static final String RETURN_MONITOR_STATISTIC = "Return monitors full statistic";
-
     @Autowired
     private GoloMonitorStatistic goloMonitorStatistic;
 
@@ -76,14 +74,13 @@ public class LaunchingApiServiceImpl implements LaunchingApiService {
         goloMonitorStatistic.getNumberStatusOfErrors().set(0);
         goloMonitorStatistic.getNumberRequestToServer().set(0);
         goloMonitorStatistic.getNumberStatusInActive().set(0);
-      }
+    }
 
 
     private void startMonitor(String hostname, Integer interval) {
 
-
         if (goloMonitorStatistic.getGoloMonitorStatus().get()) {
-            ExecutorService service =  Executors.newFixedThreadPool((interval > 1000 ? 1 : 8));   //setup from file.properties
+            ExecutorService service = Executors.newFixedThreadPool((interval > 1000 ? 1 : 8));   //setup from file.properties
             goloMonitorStatistic.setService(service);
             resetStatistic();
             service.submit(() -> {
@@ -93,8 +90,8 @@ public class LaunchingApiServiceImpl implements LaunchingApiService {
                     logger.error(INTERRUPTED_EXCEPTION, e);
                 }
             });
-        }  else {
-            logger.info("close current thread: "+ Thread.currentThread().getName());
+        } else {
+            logger.info("close current thread: " + Thread.currentThread().getName());
             goloMonitorStatistic.getService().shutdownNow();
         }
 
